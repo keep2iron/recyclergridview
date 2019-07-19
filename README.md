@@ -2,7 +2,19 @@
 
 # RecyclerGridView
 
-RecyclerGridView is flexable ViewGroup
+![](images/preview.png)
+
+RecyclerGridView is flexable ViewGroup. it can help
+
+### preview
+
+![](images/demo.gif)
+
+
+
+### usage
+
+![](images/code_example.png)
 
 
 
