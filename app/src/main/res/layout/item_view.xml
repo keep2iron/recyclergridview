@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+>
+    <io.github.keep2iron.recyclergridview.RecyclerGridView
+            android:id="@+id/recyclerGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本我是一行文本"/>
+</LinearLayout>
