@@ -6,10 +6,11 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import java.lang.StringBuilder
 import kotlin.math.roundToInt
 
 class RecyclerGridView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
     companion object {
@@ -88,7 +89,7 @@ class RecyclerGridView @JvmOverloads constructor(
                 notEmptyAdapter.itemCount
             }
             val row = itemCount / maxColumn
-            val totalVerticalSpacing = row * maxColumn
+            val totalVerticalSpacing = row * dp(gridSpacing)
             totalWidth = measureWidth
             totalHeight = if (itemCount % maxColumn != 0) {
                 itemHeight * (row + 1) + totalVerticalSpacing
@@ -98,6 +99,12 @@ class RecyclerGridView @JvmOverloads constructor(
 
             gridWidth = itemWidth
             gridHeight = itemHeight
+        }
+
+
+        for (i in 0 until childCount) {
+            getChildAt(i).measure(MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(gridHeight, MeasureSpec.EXACTLY))
         }
 
         setMeasuredDimension(totalWidth, totalHeight)
@@ -111,7 +118,7 @@ class RecyclerGridView @JvmOverloads constructor(
         val notEmptyAdapter = adapter!!
 
         val itemCount =
-            if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
+                if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
         for (i in 0 until itemCount) {
             val itemView = getChildAt(i)
 
@@ -128,13 +135,19 @@ class RecyclerGridView @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        Log.d(TAG,"onSizeChanged.....")
+//        Log.d(TAG,"onSizeChanged.....")
         val notEmptyAdapter = adapter!!
         val itemCount =
-            if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
+                if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
+
+//        val sb = StringBuilder()
+//        for (i in 0 until itemCount) {
+//            sb.append("[$i,${viewHolders[i].itemView::class.java.simpleName},${viewHolders[i].itemViewType}]")
+//        }
+//        Log.d(TAG, "onSizeChanged : $sb")
 
         for (i in 0 until itemCount) {
-            notEmptyAdapter.onBindViewHolder(viewHolders[i], i)
+            notEmptyAdapter.bindViewHolder(viewHolders[i], i)
         }
     }
 
@@ -162,16 +175,14 @@ class RecyclerGridView @JvmOverloads constructor(
                 val itemType = adapter.getItemViewType(i)
                 var viewHolder = notEmptyViewPool.getRecycledView(itemType)
                 if (viewHolder == null) {
-                    viewHolder = adapter.onCreateViewHolder(this, itemType)
+                    viewHolder = adapter.createViewHolder(this, itemType)
                     //bind view to viewHolder with view
                 }
                 viewHolders.add(viewHolder)
                 //add view
-                addView(viewHolder.itemView)
+                addView(viewHolder.itemView, generateDefaultLayoutParams())
             }
         } else {
-            val notEmptyAdapter = this.adapter!!
-
             val preAdapterItemCount = viewHolders.size
 
             when {
@@ -190,21 +201,27 @@ class RecyclerGridView @JvmOverloads constructor(
                         val itemType = adapter.getItemViewType(i)
                         var viewHolder = notEmptyViewPool.getRecycledView(itemType)
                         if (viewHolder == null) {
-                            viewHolder = adapter.onCreateViewHolder(this, itemType)
+                            viewHolder = adapter.createViewHolder(this, itemType)
                             //bind view to viewHolder with view
                         }
                         //add view
-                        addView(viewHolder.itemView)
+                        addView(viewHolder.itemView, generateDefaultLayoutParams())
                         viewHolders.add(viewHolder)
                     }
                 }
             }
 
+            val sb = StringBuilder()
+            for (i in 0 until itemCount) {
+                sb.append("[$i,${viewHolders[i].itemView::class.java.simpleName},${viewHolders[i].itemViewType},${adapter.getItemViewType(i)}]")
+            }
+            Log.d(TAG, "before setAdapter : $sb")
+
             //compare two adapter difference
             for (i in 0 until itemCount) {
-                val preItemViewType = notEmptyAdapter.getItemViewType(i)
+                val preItemViewType = viewHolders[i].itemViewType
                 val curItemViewType = adapter.getItemViewType(i)
-
+                Log.d(TAG, "different calculating before: ${preItemViewType} ${curItemViewType}")
                 //item type is different
                 if (preItemViewType != curItemViewType) {
                     //add viewHolder to pool
@@ -213,21 +230,27 @@ class RecyclerGridView @JvmOverloads constructor(
                     //remove last different type view
                     removeViewAt(i)
 
-                    val itemType = adapter.getItemViewType(i)
-                    var viewHolder = notEmptyViewPool.getRecycledView(itemType)
+                    var viewHolder = notEmptyViewPool.getRecycledView(curItemViewType)
                     if (viewHolder == null) {
-                        viewHolder = adapter.onCreateViewHolder(this, itemType)
-                        //bind view to viewHolder with view
+                        viewHolder = adapter.createViewHolder(this, curItemViewType)
                     }
+                    Log.d(TAG, "different calculating: ${viewHolder.itemView::class.java.simpleName} ${viewHolder.itemViewType}")
 
                     //add new type view
-                    addView(viewHolder.itemView)
-                    viewHolders.add(viewHolder)
+                    addView(viewHolder.itemView, i, generateDefaultLayoutParams())
+                    viewHolders.add(i, viewHolder)
                 }
+                Log.d(TAG, "different calculating after: ${preItemViewType} ${viewHolders[i].itemViewType} }")
             }
         }
 
         this.adapter = adapter
+
+        val sb = StringBuilder()
+        for (i in 0 until itemCount) {
+            sb.append("[$i,${viewHolders[i].itemView::class.java.simpleName},${viewHolders[i].itemViewType},${adapter.getItemViewType(i)}]")
+        }
+        Log.d(TAG, "after setAdapter : $sb")
 
         requestLayout()
     }
