@@ -3,19 +3,33 @@ package io.github.keep2iron.recyclergridview
 /**
  * recyclerGridView layout condition
  */
-abstract class Condition {
+abstract class Condition(block: (Condition.() -> Unit)? = null){
 
-    /**
-     * width / height ratio
-     */
-    open fun aspectRatio(): Float = 1f
+//    companion object {
+//        const val ASPECT_RATIO_AUTO_SIZE = 0f
+//    }
 
-    /**
-     *
-     */
-    open fun maxPercentLayoutInParent(): Float = 1f
+    var aspectRatio = 1f
 
-    open fun maxShowCount(): Int = 9
+    var maxPercentLayoutInParent = 1f
+
+    var maxShowCount = 9
+
+    init {
+        block?.let {
+            apply(block)
+        }
+    }
+
+    internal fun aspectRatio(): Float {
+        return aspectRatio
+    }
+
+    internal fun maxPercentLayoutInParent(): Float {
+        return maxPercentLayoutInParent
+    }
+
+    internal fun maxShowCount(): Int = maxShowCount
 
     abstract fun weatherConditionApply(count: Int): Boolean
 

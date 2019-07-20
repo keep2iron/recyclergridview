@@ -6,11 +6,11 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import java.lang.StringBuilder
+import java.util.*
 import kotlin.math.roundToInt
 
 class RecyclerGridView @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
     companion object {
@@ -24,7 +24,7 @@ class RecyclerGridView @JvmOverloads constructor(
 
     private var gridHeight = 0
 
-    private var conditions = ArrayList<Condition>()
+    private var conditions = LinkedList<Condition>()
 
     //set from condition
     private var maxColumn = -1
@@ -49,12 +49,6 @@ class RecyclerGridView @JvmOverloads constructor(
         override fun getItemViewType(position: Int): Int = 1024
     }
 
-    init {
-        conditions.add(SingleCondition())
-        conditions.add(FourXFourCondition())
-        conditions.add(DefaultCondition())
-    }
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         if (adapter == null) {
@@ -72,39 +66,54 @@ class RecyclerGridView @JvmOverloads constructor(
             it.weatherConditionApply(notEmptyAdapter.itemCount)
         }
 
-        if (notEmptyAdapter.itemCount == 1 || condition.maxShowCount() == 1) {
-            totalWidth = (condition.maxPercentLayoutInParent() * measureWidth).roundToInt()
-            totalHeight = (totalWidth / condition.aspectRatio()).roundToInt()
+        when {
+            (notEmptyAdapter.itemCount == 1 || condition.maxShowCount() == 1) -> {
+                totalWidth = (condition.maxPercentLayoutInParent() * measureWidth).roundToInt()
+                totalHeight = (totalWidth / condition.aspectRatio()).roundToInt()
+                gridWidth = totalWidth
 
-            gridWidth = totalWidth
-            gridHeight = totalHeight
-        } else {
-            measureWidth = (condition.maxPercentLayoutInParent() * measureWidth).roundToInt()
-
-            val itemWidth = ((measureWidth - (maxColumn - 1) * dp(gridSpacing)) / (maxColumn * 1f)).roundToInt()
-            val itemHeight = (itemWidth / condition.aspectRatio()).roundToInt()
-            val itemCount = if (notEmptyAdapter.itemCount >= maxImageCount) {
-                maxImageCount
-            } else {
-                notEmptyAdapter.itemCount
+                gridHeight = totalHeight
             }
-            val row = itemCount / maxColumn
-            val totalVerticalSpacing = row * dp(gridSpacing)
-            totalWidth = measureWidth
-            totalHeight = if (itemCount % maxColumn != 0) {
-                itemHeight * (row + 1) + totalVerticalSpacing
-            } else {
-                itemHeight * row + totalVerticalSpacing
-            }
+            //todo 下一个版本做进行自动适配宽高的版本
+//            (notEmptyAdapter.itemCount == 1 || condition.maxShowCount() == 1) && condition.aspectRatio == ASPECT_RATIO_AUTO_SIZE -> {
+//                val childLayoutParams = getChildAt(0).layoutParams
+//                val tempWidth = if (childLayoutParams.width > measureWidth) measureWidth else childLayoutParams.width
+//                totalWidth = (tempWidth * condition.maxPercentLayoutInParent()).roundToInt()
+//                totalHeight = (totalWidth / condition.aspectRatio()).roundToInt()
+//
+//                childLayoutParams.width = totalWidth
+//                childLayoutParams.height = totalHeight
+//            }
+            else -> {
+                measureWidth = (condition.maxPercentLayoutInParent() * measureWidth).roundToInt()
 
-            gridWidth = itemWidth
-            gridHeight = itemHeight
+                val itemWidth = ((measureWidth - (maxColumn - 1) * dp(gridSpacing)) / (maxColumn * 1f)).roundToInt()
+                val itemHeight = (itemWidth / condition.aspectRatio()).roundToInt()
+                val itemCount = if (notEmptyAdapter.itemCount >= maxImageCount) {
+                    maxImageCount
+                } else {
+                    notEmptyAdapter.itemCount
+                }
+                val row = itemCount / maxColumn
+                val totalVerticalSpacing = row * dp(gridSpacing)
+                totalWidth = measureWidth
+                totalHeight = if (itemCount % maxColumn != 0) {
+                    itemHeight * (row + 1) + totalVerticalSpacing
+                } else {
+                    itemHeight * row + totalVerticalSpacing
+                }
+
+                gridWidth = itemWidth
+                gridHeight = itemHeight
+            }
         }
 
 
         for (i in 0 until childCount) {
-            getChildAt(i).measure(MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(gridHeight, MeasureSpec.EXACTLY))
+            getChildAt(i).measure(
+                MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(gridHeight, MeasureSpec.EXACTLY)
+            )
         }
 
         setMeasuredDimension(totalWidth, totalHeight)
@@ -118,7 +127,7 @@ class RecyclerGridView @JvmOverloads constructor(
         val notEmptyAdapter = adapter!!
 
         val itemCount =
-                if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
+            if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
         for (i in 0 until itemCount) {
             val itemView = getChildAt(i)
 
@@ -135,16 +144,8 @@ class RecyclerGridView @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-//        Log.d(TAG,"onSizeChanged.....")
         val notEmptyAdapter = adapter!!
-        val itemCount =
-                if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
-
-//        val sb = StringBuilder()
-//        for (i in 0 until itemCount) {
-//            sb.append("[$i,${viewHolders[i].itemView::class.java.simpleName},${viewHolders[i].itemViewType}]")
-//        }
-//        Log.d(TAG, "onSizeChanged : $sb")
+        val itemCount = if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
 
         for (i in 0 until itemCount) {
             notEmptyAdapter.bindViewHolder(viewHolders[i], i)
@@ -211,17 +212,10 @@ class RecyclerGridView @JvmOverloads constructor(
                 }
             }
 
-            val sb = StringBuilder()
-            for (i in 0 until itemCount) {
-                sb.append("[$i,${viewHolders[i].itemView::class.java.simpleName},${viewHolders[i].itemViewType},${adapter.getItemViewType(i)}]")
-            }
-            Log.d(TAG, "before setAdapter : $sb")
-
             //compare two adapter difference
             for (i in 0 until itemCount) {
                 val preItemViewType = viewHolders[i].itemViewType
                 val curItemViewType = adapter.getItemViewType(i)
-                Log.d(TAG, "different calculating before: ${preItemViewType} ${curItemViewType}")
                 //item type is different
                 if (preItemViewType != curItemViewType) {
                     //add viewHolder to pool
@@ -234,29 +228,32 @@ class RecyclerGridView @JvmOverloads constructor(
                     if (viewHolder == null) {
                         viewHolder = adapter.createViewHolder(this, curItemViewType)
                     }
-                    Log.d(TAG, "different calculating: ${viewHolder.itemView::class.java.simpleName} ${viewHolder.itemViewType}")
 
                     //add new type view
                     addView(viewHolder.itemView, i, generateDefaultLayoutParams())
                     viewHolders.add(i, viewHolder)
                 }
-                Log.d(TAG, "different calculating after: ${preItemViewType} ${viewHolders[i].itemViewType} }")
             }
         }
 
         this.adapter = adapter
-
-        val sb = StringBuilder()
-        for (i in 0 until itemCount) {
-            sb.append("[$i,${viewHolders[i].itemView::class.java.simpleName},${viewHolders[i].itemViewType},${adapter.getItemViewType(i)}]")
-        }
-        Log.d(TAG, "after setAdapter : $sb")
-
         requestLayout()
     }
 
     fun addCondition(condition: Condition) {
         conditions.add(0, condition)
+    }
+
+    fun addConditionOfEnd(condition: Condition) {
+        conditions.add(condition)
+    }
+
+    fun addAllCondition(conditions: List<Condition>) {
+        this.conditions.addAll(conditions)
+    }
+
+    fun conditions(): List<Condition> {
+        return conditions
     }
 
     override fun generateDefaultLayoutParams(): LayoutParams {
