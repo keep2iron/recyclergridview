@@ -36,6 +36,7 @@ dependencies {
     implementation deps.support.recyclerview
     implementation deps.support.constraint_layout
     implementation project(':recyclergridview')
+
     implementation 'com.github.keep2iron:pineapple:0.21'
     implementation deps.fresco
 
