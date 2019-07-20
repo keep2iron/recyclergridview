@@ -129,15 +129,8 @@ ext.versions = versions
 def addRepos(handler) {
     handler.google()
     handler.jcenter()
-//    handler.maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     handler.maven {
         url "https://jitpack.io"
-    }
-    handler.maven {
-        url "http://mvn.mob.com/android"
-    }
-    handler.maven {
-        url uri('./repo')
     }
 }
 

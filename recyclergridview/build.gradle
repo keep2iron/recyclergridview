@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     resourcePrefix "recycler_grid_view"
@@ -8,7 +9,7 @@ android {
     buildToolsVersion versions.build.build_tools
 
     defaultConfig {
-        minSdkVersion versions.build.min_sdk
+        minSdkVersion 15
         targetSdkVersion versions.build.target_sdk
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -34,6 +35,12 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 }
-repositories {
-    mavenCentral()
+
+publish {
+    userOrg = 'keep2iron'
+    groupId = 'io.github.keep2iron'
+    artifactId = 'recyclergridview'
+    publishVersion = '0.0.1'
+    desc = 'flexable and perfermence ninegrid layout'
+    website = 'https://keep2iron.github.io'
 }
