@@ -2,6 +2,8 @@
 
 # RecyclerGridView
 
+![](https://api.bintray.com/packages/keep2iron/maven/recyclergridview/images/download.svg)![BuildStatus](https://travis-ci.org/keep2iron/recyclergridview.svg?branch=master)
+
 ![](images/preview.png)
 
 RecyclerGridView is an nine gridlayout.
@@ -10,6 +12,12 @@ RecyclerGridView is an nine gridlayout.
 * good performance(with RecyclerView pool)
 * support multiple type
 * flexable
+
+### gradle
+
+````groovy
+implementation 'io.github.keep2iron:recyclergridview:$last_version'
+````
 
 ### preview
 
