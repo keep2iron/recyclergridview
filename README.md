@@ -2,7 +2,7 @@
 
 # RecyclerGridView
 
-![](https://api.bintray.com/packages/keep2iron/maven/recyclergridview/images/download.svg)![BuildStatus](https://travis-ci.org/keep2iron/recyclergridview.svg?branch=master)
+![](https://api.bintray.com/packages/keep2iron/maven/recyclergridview/images/download.svg) ![BuildStatus](https://travis-ci.org/keep2iron/recyclergridview.svg?branch=master)
 
 ![](images/preview.png)
 
