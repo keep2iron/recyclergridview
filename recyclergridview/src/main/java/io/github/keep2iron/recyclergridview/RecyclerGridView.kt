@@ -108,7 +108,6 @@ class RecyclerGridView @JvmOverloads constructor(
             }
         }
 
-
         for (i in 0 until childCount) {
             getChildAt(i).measure(
                 MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
@@ -124,6 +123,7 @@ class RecyclerGridView @JvmOverloads constructor(
             Log.w(TAG, "adapter is null, onLayout will skip.")
             return
         }
+//        Log.d(TAG, "changed: ${changed} l : ${l} t: $t r: $r b : $b")
         val notEmptyAdapter = adapter!!
 
         val itemCount =
@@ -137,7 +137,6 @@ class RecyclerGridView @JvmOverloads constructor(
             val right = left + gridWidth
             val top = paddingTop + (gridHeight + dp(gridSpacing)) * row
             val bottom = gridHeight + top
-
             itemView.layout(left, top, right, bottom)
         }
     }
@@ -145,10 +144,13 @@ class RecyclerGridView @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         val notEmptyAdapter = adapter!!
-        val itemCount = if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
 
-        for (i in 0 until itemCount) {
-            notEmptyAdapter.bindViewHolder(viewHolders[i], i)
+        val itemCount =
+            if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
+        post {
+            for (i in 0 until itemCount) {
+                notEmptyAdapter.bindViewHolder(viewHolders[i], i)
+            }
         }
     }
 
@@ -237,7 +239,7 @@ class RecyclerGridView @JvmOverloads constructor(
         }
 
         this.adapter = adapter
-        requestLayout()
+//        requestLayout()
     }
 
     fun addCondition(condition: Condition) {
