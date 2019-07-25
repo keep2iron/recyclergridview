@@ -14,11 +14,11 @@ android {
 
     defaultConfig {
         applicationId "io.github.keep2iron.recyclergridview.app"
-        minSdkVersion versions.build.min_sdk
+        minSdkVersion 15
         targetSdkVersion versions.build.target_sdk
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "android.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -37,7 +37,7 @@ dependencies {
     implementation deps.support.constraint_layout
     implementation project(':recyclergridview')
 
-    implementation 'com.github.keep2iron:pineapple:0.21'
+    implementation 'io.github.keep2iron:pineapple:0.0.1'
     implementation deps.fresco
 
     testImplementation 'junit:junit:4.12'

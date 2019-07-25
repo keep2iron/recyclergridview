@@ -36,9 +36,6 @@ class MyGridAdapter(val context: Context,private val item: Data) : RecyclerGridV
                     radiusBottomRight = if (pos == 6) dp(10) else 0f
                     radiusBottomLeft = if (pos == 8) dp(10) else 0f
                 } else {
-                    onFinalImageSetListener = {
-
-                    }
                 }
             }
         }
