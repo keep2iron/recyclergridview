@@ -88,15 +88,15 @@ class RecyclerGridView @JvmOverloads constructor(
         gridHeight = totalHeight
       }
       //todo 下一个版本做进行自动适配宽高的版本
-//            (notEmptyAdapter.itemCount == 1 || condition.maxShowCount() == 1) && condition.aspectRatio == ASPECT_RATIO_AUTO_SIZE -> {
-//                val childLayoutParams = getChildAt(0).layoutParams
-//                val tempWidth = if (childLayoutParams.width > measureWidth) measureWidth else childLayoutParams.width
-//                totalWidth = (tempWidth * condition.maxPercentLayoutInParent()).roundToInt()
-//                totalHeight = (totalWidth / condition.aspectRatio()).roundToInt()
-//
-//                childLayoutParams.width = totalWidth
-//                childLayoutParams.height = totalHeight
-//            }
+      //            (notEmptyAdapter.itemCount == 1 || condition.maxShowCount() == 1) && condition.aspectRatio == ASPECT_RATIO_AUTO_SIZE -> {
+      //                val childLayoutParams = getChildAt(0).layoutParams
+      //                val tempWidth = if (childLayoutParams.width > measureWidth) measureWidth else childLayoutParams.width
+      //                totalWidth = (tempWidth * condition.maxPercentLayoutInParent()).roundToInt()
+      //                totalHeight = (totalWidth / condition.aspectRatio()).roundToInt()
+      //
+      //                childLayoutParams.width = totalWidth
+      //                childLayoutParams.height = totalHeight
+      //            }
       else -> {
         measureWidth = (condition.maxPercentLayoutInParent() * measureWidth).roundToInt()
 
