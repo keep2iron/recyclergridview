@@ -3,42 +3,41 @@ apply plugin: 'kotlin-android'
 
 android {
 
-    compileSdkVersion versions.build.target_sdk
-    buildToolsVersion versions.build.build_tools
+  compileSdkVersion versions.build.target_sdk
+  buildToolsVersion versions.build.build_tools
 
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+  defaultConfig {
+    applicationId "io.github.keep2iron.recyclergridview.app"
+    minSdkVersion 15
+    targetSdkVersion versions.build.target_sdk
+    versionCode 1
+    versionName "1.0"
+    testInstrumentationRunner "android.test.runner.AndroidJUnitRunner"
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
-
-    defaultConfig {
-        applicationId "io.github.keep2iron.recyclergridview.app"
-        minSdkVersion 15
-        targetSdkVersion versions.build.target_sdk
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.test.runner.AndroidJUnitRunner"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
+  }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation deps.support.app_compat
-    implementation deps.kotlin.stdlib_jdk7
-    implementation deps.support.recyclerview
-    implementation deps.support.constraint_layout
-    implementation project(':recyclergridview')
+  implementation deps.support.app_compat
+  implementation deps.kotlin.stdlib_jdk7
+  implementation deps.support.recyclerview
+  implementation deps.support.constraint_layout
+  implementation project(':recyclergridview')
 
-    implementation 'io.github.keep2iron:pineapple:0.0.1'
-    implementation deps.fresco
+  implementation 'io.github.keep2iron:pineapple:0.0.1'
+  implementation deps.fresco
 
-    testImplementation 'junit:junit:4.12'
+  testImplementation 'junit:junit:4.12'
 }
