@@ -40,7 +40,7 @@ publish {
   userOrg = 'keep2iron'
   groupId = 'io.github.keep2iron'
   artifactId = 'recyclergridview'
-  publishVersion = '0.0.1'
+  publishVersion = '0.0.2'
   desc = 'flexable and perfermence ninegrid layout'
   website = 'https://keep2iron.github.io'
 }

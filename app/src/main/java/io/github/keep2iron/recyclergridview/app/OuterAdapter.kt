@@ -2,6 +2,7 @@ package io.github.keep2iron.recyclergridview.app
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import io.github.keep2iron.pineapple.ImageLoaderManager
 import io.github.keep2iron.recyclergridview.DefaultCondition
 import io.github.keep2iron.recyclergridview.RecyclerGridView
@@ -11,18 +12,18 @@ import io.github.keep2iron.recyclergridview.TwoXTwoCondition
 class OuterAdapter(
   val list: List<Data>,
   val viewPool: androidx.recyclerview.widget.RecyclerView.RecycledViewPool
-) :
-    androidx.recyclerview.widget.RecyclerView.Adapter<CustomViewHolder>() {
+) : RecyclerView.Adapter<CustomViewHolder>() {
+
   override fun onCreateViewHolder(
     parent: ViewGroup,
     viewType: Int
   ): CustomViewHolder {
     val holder = CustomViewHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.item_view,
-            parent,
-            false
-        )
+      LayoutInflater.from(parent.context).inflate(
+        R.layout.item_view,
+        parent,
+        false
+      )
     )
     val gridView = holder.itemView.findViewById<RecyclerGridView>(R.id.recyclerGridView)
     gridView.setViewPool(viewPool)
@@ -43,10 +44,27 @@ class OuterAdapter(
   ) {
     val gridView = holder.itemView.findViewById<RecyclerGridView>(R.id.recyclerGridView)
     ImageLoaderManager.getInstance()
-        .showImageView(holder.itemView.findViewById(R.id.ivAvatar), R.drawable.ic_avatar) {
-          isCircleImage = true
-        }
+      .showImageView(holder.itemView.findViewById(R.id.ivAvatar), R.drawable.ic_avatar) {
+        isCircleImage = true
+      }
 
-    gridView.setAdapter(MyGridAdapter(holder.itemView.context, list[position]))
+    val tag: Any? = holder.itemView.tag
+    val adapter = if (tag == null) {
+      val adapter = MyGridAdapter(holder.itemView.context, list[position])
+      holder.itemView.tag = adapter
+      adapter
+    } else {
+      (tag as MyGridAdapter).setItem(list[position])
+      tag
+    }
+    gridView.setAdapter(adapter)
+  }
+
+  override fun getItemViewType(position: Int): Int {
+    return list[position].imageVies.size
+  }
+
+  override fun getItemId(position: Int): Long {
+    return list[position].hashCode().toLong()
   }
 }

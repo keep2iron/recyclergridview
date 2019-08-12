@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import java.util.LinkedList
 import kotlin.math.roundToInt
 
@@ -34,16 +35,20 @@ class RecyclerGridView @JvmOverloads constructor(
 
   private var adapter: Adapter? = null
 
-  private var viewPool: androidx.recyclerview.widget.RecyclerView.RecycledViewPool? = null
+  private var viewPool: RecyclerView.RecycledViewPool? = null
 
-  private var viewHolders = mutableListOf<androidx.recyclerview.widget.RecyclerView.ViewHolder>()
+  //用于盘点bindAdapter的标志,因为recyclerView中可能连续存在相同大小的Item因此设置这个标志
+  private var resetFlag = false
 
-  open class InternalViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(
+  private var viewHolders = mutableListOf<RecyclerView.ViewHolder>()
+
+  open class InternalViewHolder(itemView: View) :
+    RecyclerView.ViewHolder(
       itemView
-  )
+    )
 
   abstract class Adapter :
-      androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(
       viewParent: ViewGroup,
       viewType: Int
@@ -124,8 +129,8 @@ class RecyclerGridView @JvmOverloads constructor(
 
     for (i in 0 until childCount) {
       getChildAt(i).measure(
-          MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
-          MeasureSpec.makeMeasureSpec(gridHeight, MeasureSpec.EXACTLY)
+        MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
+        MeasureSpec.makeMeasureSpec(gridHeight, MeasureSpec.EXACTLY)
       )
     }
 
@@ -158,7 +163,12 @@ class RecyclerGridView @JvmOverloads constructor(
       val top = paddingTop + (gridHeight + dp(gridSpacing)) * row
       val bottom = gridHeight + top
       itemView.layout(left, top, right, bottom)
+
+      if (resetFlag) {
+        notEmptyAdapter.bindViewHolder(viewHolders[i], i)
+      }
     }
+    resetFlag = false
   }
 
   override fun onSizeChanged(
@@ -170,11 +180,14 @@ class RecyclerGridView @JvmOverloads constructor(
     super.onSizeChanged(w, h, oldw, oldh)
     val notEmptyAdapter = adapter!!
 
-    val itemCount =
-      if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
-    post {
-      for (i in 0 until itemCount) {
-        notEmptyAdapter.bindViewHolder(viewHolders[i], i)
+    if (resetFlag) {
+      val itemCount =
+        if (notEmptyAdapter.itemCount >= maxImageCount) maxImageCount else notEmptyAdapter.itemCount
+      post {
+        for (i in 0 until itemCount) {
+          notEmptyAdapter.bindViewHolder(viewHolders[i], i)
+        }
+        resetFlag = false
       }
     }
   }
@@ -183,7 +196,7 @@ class RecyclerGridView @JvmOverloads constructor(
     return (resources.displayMetrics.density * dp).roundToInt()
   }
 
-  fun setViewPool(viewPool: androidx.recyclerview.widget.RecyclerView.RecycledViewPool) {
+  fun setViewPool(viewPool: RecyclerView.RecycledViewPool) {
     this.viewPool = viewPool
   }
 
@@ -221,7 +234,7 @@ class RecyclerGridView @JvmOverloads constructor(
             notEmptyViewPool.putRecycledView(viewHolder)
           }
           viewHolders.subList(itemCount, preAdapterItemCount)
-              .clear()
+            .clear()
 
           removeViews(adapter.itemCount, preAdapterItemCount - itemCount)
         }
@@ -265,7 +278,7 @@ class RecyclerGridView @JvmOverloads constructor(
     }
 
     this.adapter = adapter
-//        requestLayout()
+    resetFlag = true
   }
 
   fun addCondition(condition: Condition) {
