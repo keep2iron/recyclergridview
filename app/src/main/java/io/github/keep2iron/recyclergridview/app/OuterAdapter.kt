@@ -4,10 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.github.keep2iron.pineapple.ImageLoaderManager
-import io.github.keep2iron.recyclergridview.DefaultCondition
+import io.github.keep2iron.recyclergridview.Condition
 import io.github.keep2iron.recyclergridview.RecyclerGridView
-import io.github.keep2iron.recyclergridview.SingleCondition
-import io.github.keep2iron.recyclergridview.TwoXTwoCondition
+import io.github.keep2iron.recyclergridview.util.AspectRatio
 
 class OuterAdapter(
   val list: List<Data>,
@@ -26,13 +25,15 @@ class OuterAdapter(
       )
     )
     val gridView = holder.itemView.findViewById<RecyclerGridView>(R.id.recyclerGridView)
-    gridView.setViewPool(viewPool)
-    gridView.addAllCondition(arrayListOf(SingleCondition {
-      aspectRatio = 0.875f
-      maxPercentLayoutInParent = 0.85f
-    }, TwoXTwoCondition {
-      maxPercentLayoutInParent = 0.75f
-    }, DefaultCondition()))
+    gridView.findRecyclerViewPool(parent)
+    gridView.addAllCondition(arrayListOf(
+      Condition.createSingleCondition(
+        itemAspectRatio = AspectRatio.wrap()
+      )
+      , Condition.create2X2Condition()
+      , Condition.createDefaultCondition(
+        itemAspectRatio = AspectRatio.wrap()
+      )))
     return holder
   }
 

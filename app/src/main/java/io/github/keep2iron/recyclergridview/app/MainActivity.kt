@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     BlockDetectByLooper.start()
 
     val items = arrayListOf(
-      Data(generateImages(9)),
+      Data(generateImages(1)),
       Data(generateImages(8)),
       Data(generateImages(7)),
       Data(generateImages(6)),
@@ -83,13 +83,8 @@ class MainActivity : AppCompatActivity() {
       androidx.recyclerview.widget.LinearLayoutManager(applicationContext)
     recyclerView.setRecycledViewPool(viewPool)
     val outerAdapter = OuterAdapter(items, viewPool)
-    outerAdapter.setHasStableIds(true)
     recyclerView.adapter = outerAdapter
-    recyclerView.setItemViewCacheSize(20);
-    recyclerView.setDrawingCacheEnabled(true);
-    recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
     ImageLoaderManager.getInstance().pause(recyclerView.context)
-
     recyclerView.addOnScrollListener(object : OnScrollListener() {
       override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         ImageLoaderManager.getInstance().pause(recyclerView.context)
